@@ -25,7 +25,8 @@ const connect = async () => {
     }
 };
 
-app.use(cors({ origin: process.env.MY_SITE, credentials: true }));
+// app.use(cors({ origin: process.env.MY_SITE, credentials: true }));
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("combined"));
@@ -37,7 +38,9 @@ app.use("/api/conversations", conversationRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/reviews", reviewRoute);
 
-app.get("/test-page", res.send("Test Page"));
+app.get("/test-page", (req, res, next) => {
+    res.send("Test Page");
+});
 
 app.use((err, req, res, next) => {
     const errorStatus = err.status || 500;
