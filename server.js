@@ -14,19 +14,11 @@ import cors from "cors";
 import morgan from "morgan";
 
 const app = express();
+const PORT = process.env.PORT || 8801;
 mongoose.set("strictQuery", true);
 
-const connect = async () => {
-    try {
-        await mongoose.connect(process.env.DB);
-        console.log("Connected to mongoDB!");
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-// app.use(cors({ origin: process.env.MY_SITE, credentials: true }));
-app.use(cors());
+app.use(cors({ origin: process.env.MY_SITE, credentials: true }));
+// app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("combined"));
@@ -49,7 +41,17 @@ app.use((err, req, res, next) => {
     return res.status(errorStatus).send(errorMessage);
 });
 
-app.listen(8800, () => {
-    connect();
-    console.log("Backend server is running!");
-});
+mongoose
+    .connect(process.env.DB, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`DB connected! Server is running on port ${PORT}`);
+        });
+    })
+    .catch((err) => {
+        console.log(err.message);
+        process.exit(1);
+    });
